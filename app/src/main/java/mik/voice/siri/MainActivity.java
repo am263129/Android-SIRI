@@ -2,12 +2,16 @@ package mik.voice.siri;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.androdocs.httprequest.HttpRequest;
@@ -27,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     TextView addressTxt, updated_atTxt, statusTxt, tempTxt, temp_minTxt, temp_maxTxt, sunriseTxt,
             sunsetTxt, windTxt, pressureTxt, humidityTxt, cityName;
     Button run;
+    RelativeLayout root_back;
+    ImageView api_data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +57,21 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 CITY = cityName.getText().toString();
                 new weatherTask().execute();
+            }
+        });
+        root_back = findViewById(R.id.root_back);
+
+        AnimationDrawable animationDrawable = (AnimationDrawable) root_back.getBackground();
+        animationDrawable.setEnterFadeDuration(10);
+        animationDrawable.setExitFadeDuration(5000);
+        animationDrawable.start();
+
+        api_data = findViewById(R.id.api_data);
+        api_data.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, api_data.class);
+                startActivity(intent);
             }
         });
 

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/api_back"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_animation"
+    android:orientation="vertical"
+    tools:context=".api_data">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/dampra"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="100dp"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:text="Rules"
+                    android:textColor="?attr/colorError"
+                    android:textSize="18sp"
+                    app:fontFamily="@font/racing_sans_one" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="40dp"
+                    android:background="@drawable/border">
+
+                    <ListView
+                        android:id="@+id/list_rules"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/Instructions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:text="Instructions"
+                    android:textColor="?attr/colorError"
+                    android:textSize="18sp"
+                    app:fontFamily="@font/racing_sans_one" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="40dp"
+                    android:background="@drawable/border">
+
+                    <ListView
+                        android:id="@+id/list_instructions"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:text="Terms &amp; Conditions"
+                    android:textColor="?attr/colorError"
+                    android:textSize="18sp"
+                    app:fontFamily="@font/racing_sans_one" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/border">
+
+                    <ListView
+                        android:id="@+id/list_terms"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/vresion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="50dp"
+                    android:gravity="center"
+                    android:text="Version  1.0.0"
+                    android:textColor="@color/colorGradientStart"
+                    android:textSize="18sp"
+                    app:fontFamily="@font/racing_sans_one" />
+
+                <TextView
+                    android:id="@+id/support"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Android.siri.shi.com"
+                    android:textColor="@color/colorGradientStart"
+                    android:textSize="18sp"
+                    app:fontFamily="@font/racing_sans_one" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:orientation="vertical"></LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
