@@ -123,6 +123,7 @@ public class api_data extends AppCompatActivity {
                     check_get();
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Log.e("Error",e.toString());
                 }
             }
         });
@@ -207,7 +208,7 @@ public class api_data extends AppCompatActivity {
                                 temp += "}";
                             JSONObject jObj = new JSONObject(temp);
                             String id = jObj.get("id").toString();
-                            String description = jObj.get("description").toString();
+                            String description = jObj.get("description").toString().replaceFirst("\\s++$", "");
                             Log.i("id",jObj.get("id").toString());
                             Log.i("desc",jObj.get("description").toString());
                             switch (class_name){

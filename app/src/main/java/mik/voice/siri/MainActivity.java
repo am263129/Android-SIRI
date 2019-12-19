@@ -3,14 +3,23 @@ package mik.voice.siri;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -20,8 +29,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+
+import mik.voice.siri.apps.PInfo;
+import mik.voice.siri.apps.PInfo_adapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,9 +44,16 @@ public class MainActivity extends AppCompatActivity {
 
     TextView addressTxt, updated_atTxt, statusTxt, tempTxt, temp_minTxt, temp_maxTxt, sunriseTxt,
             sunsetTxt, windTxt, pressureTxt, humidityTxt, cityName;
-    Button run;
+    ImageView run;
+    LinearLayout container_address, container_overview, container_details, container_apps;
+    ListView similar_apps;
     RelativeLayout root_back;
     ImageView api_data;
+    boolean Listenting = false;
+    boolean show = true;
+    boolean hide = false;
+    ArrayList<PInfo> apps = new ArrayList<>();
+    ArrayList<PInfo> s_apps = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,16 +72,37 @@ public class MainActivity extends AppCompatActivity {
         pressureTxt = findViewById(R.id.pressure);
         humidityTxt = findViewById(R.id.humidity);
         cityName = findViewById(R.id.edit_city_name);
+        container_address = findViewById(R.id.addressContainer);
+        container_overview = findViewById(R.id.overviewContainer);
+        container_details = findViewById(R.id.detailsContainer);
+        container_apps = findViewById(R.id.container_apps);
+        similar_apps = findViewById(R.id.similar_apps);
         run = findViewById(R.id.run);
         run.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Listenting = !Listenting;
+                if (Listenting)
+                    run.setBackgroundResource(R.drawable.btn_mic_active);
+                else
+                    run.setBackgroundResource(R.drawable.btn_mic);
                 CITY = cityName.getText().toString();
+                /**
+                 * weather
+                 */
+                weather_show(show);
                 new weatherTask().execute();
+
+                /**
+                 * inner Apps
+                 */
+
             }
         });
         root_back = findViewById(R.id.root_back);
 
+        weather_show(hide);
+        get_installed_app();
         AnimationDrawable animationDrawable = (AnimationDrawable) root_back.getBackground();
         animationDrawable.setEnterFadeDuration(10);
         animationDrawable.setExitFadeDuration(5000);
@@ -76,6 +118,77 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+    public void inner_app_runner(){
+        weather_show(hide);
+        s_apps.clear();
+
+        for (Integer i = 0; i < apps.size(); i ++){
+            if(apps.get(i).getAppname().toLowerCase().contains(cityName.getText().toString()))
+                s_apps.add(apps.get(i));
+        }
+
+        if(s_apps.size()>0) {
+            PInfo_adapter adapter = new PInfo_adapter(MainActivity.this, R.layout.item_apps, s_apps);
+            similar_apps.setAdapter(adapter);
+            similar_apps.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String package_name = s_apps.get(position).getPname();
+                    Intent launchIntent = getPackageManager().getLaunchIntentForPackage(package_name);
+                    if (launchIntent != null) {
+                        startActivity(launchIntent);//null pointer check in case package name was not found
+                    }
+                }
+            });
+        }
+    }
+
+    public void weather_show(boolean show){
+        if(show){
+            container_details.setVisibility(View.VISIBLE);
+            container_address.setVisibility(View.VISIBLE);
+            container_overview.setVisibility(View.VISIBLE);
+            container_apps.setVisibility(View.GONE);
+        }
+        else{
+            container_details.setVisibility(View.GONE);
+            container_overview.setVisibility(View.GONE);
+            container_address.setVisibility(View.GONE);
+            container_apps.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void get_installed_app(){
+        Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> pkgAppsList = this.getPackageManager().queryIntentActivities( mainIntent, 0);
+        apps.clear();
+        apps = getPackages();
+    }
+
+
+    private ArrayList<PInfo> getPackages() {
+        ArrayList<PInfo> apps = getInstalledApps(false); /* false = no system packages */
+        final int max = apps.size();
+        for (int i=0; i<max; i++) {
+            apps.get(i).prettyPrint();
+        }
+        return apps;
+    }
+
+    private ArrayList<PInfo> getInstalledApps(boolean getSysPackages) {
+        ArrayList<PInfo> res = new ArrayList<PInfo>();
+        List<PackageInfo> packs = getPackageManager().getInstalledPackages(0);
+        for(int i=0;i<packs.size();i++) {
+            PackageInfo p = packs.get(i);
+            if ((!getSysPackages) && (p.versionName == null)) {
+                continue ;
+            }
+            PInfo newInfo = new PInfo(p.applicationInfo.loadLabel(getPackageManager()).toString(),p.packageName,p.versionName, p.versionCode, p.applicationInfo.loadIcon(getPackageManager()));
+            res.add(newInfo);
+        }
+        return res;
     }
 
     class weatherTask extends AsyncTask<String, Void, String> {
@@ -141,9 +254,10 @@ public class MainActivity extends AppCompatActivity {
 
             } catch (JSONException e) {
                 findViewById(R.id.loader).setVisibility(View.GONE);
-                findViewById(R.id.errorText).setVisibility(View.VISIBLE);
-                CITY = "London";
-                new weatherTask().execute();
+//                findViewById(R.id.errorText).setVisibility(View.VISIBLE);
+//                CITY = "London";
+//                new weatherTask().execute();
+                inner_app_runner();
             }
 
         }
