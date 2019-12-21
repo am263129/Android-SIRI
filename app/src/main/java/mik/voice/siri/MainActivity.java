@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -12,6 +13,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.androdocs.httprequest.HttpRequest;
 import com.google.android.material.snackbar.Snackbar;
@@ -59,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private WaveformView mRealtimeWaveformView;
     private RecordingThread mRecordingThread;
     private static final int REQUEST_RECORD_AUDIO = 13;
+    private final int REQ_CODE_SPEECH_INPUT = 100;
 
 
     @Override
@@ -87,24 +91,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Listenting = !Listenting;
-                if (Listenting)
+                if (Listenting) {
                     run.setBackgroundResource(R.drawable.btn_mic_active);
+                    promptSpeechInput();
+                }
                 else
                     run.setBackgroundResource(R.drawable.btn_mic);
-                CITY = cityName.getText().toString();
-                /**
-                 * weather
-                 */
-                weather_show(show);
-                try {
-                    new weatherTask().execute();
-                }
-                catch (Exception E){
-                    Log.e("error",E.toString());
-                }
-                /**
-                 * inner Apps
-                 */
+
+
 
             }
         });
@@ -128,6 +122,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         // wave animation
+        set_animation();
+
+        //end
+    }
+    private void set_animation(){
         mRealtimeWaveformView = (WaveformView) findViewById(R.id.waveformView);
         mRecordingThread = new RecordingThread(new AudioDataReceivedListener() {
             @Override
@@ -141,14 +140,29 @@ public class MainActivity extends AppCompatActivity {
         } else {
             mRecordingThread.stopRecording();
         }
+    }
 
-        //end
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+                getString(R.string.speech_prompt));
+        try {
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getApplicationContext(),
+                    getString(R.string.speech_not_supported),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
     @Override
     public void onResume() {
 
         super.onResume();
         set_init();
+        set_animation();
     }
     @Override
     protected void onStop() {
@@ -347,6 +361,36 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_RECORD_AUDIO && grantResults.length > 0 &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             mRecordingThread.stopRecording();
+        }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQ_CODE_SPEECH_INPUT: {
+                run.setBackgroundResource(R.drawable.btn_mic);
+                Listenting = false;
+                if (resultCode == RESULT_OK && null != data) {
+
+                    ArrayList<String> result = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    CITY = result.get(0);
+                    cityName.setText(result.get(0).toString());
+                    /**
+                     * weather
+                     */
+                    weather_show(show);
+                    try {
+                        new weatherTask().execute();
+                    }
+                    catch (Exception E){
+                        Log.e("error",E.toString());
+                    }
+                }
+                break;
+            }
+
         }
     }
 }

@@ -58,6 +58,7 @@ public class api_data extends AppCompatActivity {
         list_terms = findViewById(R.id.list_terms);
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading Data...");
+        dialog.setCancelable(false);
         dialog.show();
         AnimationDrawable animationDrawable = (AnimationDrawable) api_back.getBackground();
         animationDrawable.setEnterFadeDuration(10);

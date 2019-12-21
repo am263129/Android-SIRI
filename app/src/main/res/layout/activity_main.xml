@@ -396,8 +396,8 @@
 
     <ImageView
         android:id="@+id/run"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_alignParentLeft="false"
         android:layout_alignParentRight="false"
         android:layout_alignParentBottom="true"
