@@ -1,22 +1,21 @@
 package mik.voice.siri;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -24,6 +23,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.androdocs.httprequest.HttpRequest;
+import com.google.android.material.snackbar.Snackbar;
+import com.newventuresoftware.waveform.WaveformView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,11 +56,15 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<PInfo> apps = new ArrayList<>();
     ArrayList<PInfo> s_apps = new ArrayList<>();
 
+    private WaveformView mRealtimeWaveformView;
+    private RecordingThread mRecordingThread;
+    private static final int REQUEST_RECORD_AUDIO = 13;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         addressTxt = findViewById(R.id.address);
         updated_atTxt = findViewById(R.id.updated_at);
         statusTxt = findViewById(R.id.status);
@@ -91,8 +96,12 @@ public class MainActivity extends AppCompatActivity {
                  * weather
                  */
                 weather_show(show);
-                new weatherTask().execute();
-
+                try {
+                    new weatherTask().execute();
+                }
+                catch (Exception E){
+                    Log.e("error",E.toString());
+                }
                 /**
                  * inner Apps
                  */
@@ -101,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         });
         root_back = findViewById(R.id.root_back);
 
-        weather_show(hide);
+//        weather_show(hide);
         get_installed_app();
         AnimationDrawable animationDrawable = (AnimationDrawable) root_back.getBackground();
         animationDrawable.setEnterFadeDuration(10);
@@ -118,29 +127,66 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        // wave animation
+        mRealtimeWaveformView = (WaveformView) findViewById(R.id.waveformView);
+        mRecordingThread = new RecordingThread(new AudioDataReceivedListener() {
+            @Override
+            public void onAudioDataReceived(short[] data) {
+                mRealtimeWaveformView.setSamples(data);
+            }
+        });
+
+        if (!mRecordingThread.recording()) {
+            startAudioRecordingSafe();
+        } else {
+            mRecordingThread.stopRecording();
+        }
+
+        //end
     }
+    @Override
+    public void onResume() {
+
+        super.onResume();
+        set_init();
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        mRecordingThread.stopRecording();
+    }
+
     public void inner_app_runner(){
         weather_show(hide);
         s_apps.clear();
-
         for (Integer i = 0; i < apps.size(); i ++){
             if(apps.get(i).getAppname().toLowerCase().contains(cityName.getText().toString()))
                 s_apps.add(apps.get(i));
         }
 
         if(s_apps.size()>0) {
-            PInfo_adapter adapter = new PInfo_adapter(MainActivity.this, R.layout.item_apps, s_apps);
-            similar_apps.setAdapter(adapter);
-            similar_apps.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    String package_name = s_apps.get(position).getPname();
-                    Intent launchIntent = getPackageManager().getLaunchIntentForPackage(package_name);
-                    if (launchIntent != null) {
-                        startActivity(launchIntent);//null pointer check in case package name was not found
-                    }
+            if(s_apps.size() ==1){
+                String package_name = s_apps.get(0).getPname();
+                Intent launchIntent = getPackageManager().getLaunchIntentForPackage(package_name);
+                if (launchIntent != null) {
+                    startActivity(launchIntent);//null pointer check in case package name was not found
                 }
-            });
+            }
+            else {
+                PInfo_adapter adapter = new PInfo_adapter(MainActivity.this, R.layout.item_apps, s_apps);
+                similar_apps.setAdapter(adapter);
+                similar_apps.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        String package_name = s_apps.get(position).getPname();
+                        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(package_name);
+                        if (launchIntent != null) {
+                            startActivity(launchIntent);//null pointer check in case package name was not found
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -157,6 +203,12 @@ public class MainActivity extends AppCompatActivity {
             container_address.setVisibility(View.GONE);
             container_apps.setVisibility(View.VISIBLE);
         }
+    }
+    public void set_init(){
+        container_details.setVisibility(View.GONE);
+        container_overview.setVisibility(View.GONE);
+        container_address.setVisibility(View.GONE);
+        container_apps.setVisibility(View.GONE);
     }
 
     public void get_installed_app(){
@@ -198,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
 
             /* Showing the ProgressBar, Making the main design GONE */
             findViewById(R.id.loader).setVisibility(View.VISIBLE);
-            findViewById(R.id.mainContainer).setVisibility(View.GONE);
+//            findViewById(R.id.mainContainer).setVisibility(View.GONE);
             findViewById(R.id.errorText).setVisibility(View.GONE);
         }
 
@@ -260,6 +312,41 @@ public class MainActivity extends AppCompatActivity {
                 inner_app_runner();
             }
 
+        }
+    }
+
+    private void startAudioRecordingSafe() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO)
+                == PackageManager.PERMISSION_GRANTED) {
+            mRecordingThread.startRecording();
+        } else {
+            requestMicrophonePermission();
+        }
+    }
+
+    private void requestMicrophonePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.RECORD_AUDIO)) {
+            // Show dialog explaining why we need record audio
+            Snackbar.make(mRealtimeWaveformView, "Microphone access is required in order to record audio",
+                    Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{
+                            android.Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
+                }
+            }).show();
+        } else {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{
+                    android.Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_RECORD_AUDIO && grantResults.length > 0 &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            mRecordingThread.stopRecording();
         }
     }
 }

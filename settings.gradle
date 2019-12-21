@@ -1,2 +1,3 @@
-include ':app'
+include ':app', ':_waveform'
 rootProject.name='siri'
+project(':_waveform').projectDir = new File('waveform')

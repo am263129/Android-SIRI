@@ -28,4 +28,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     implementation 'com.github.androdocs:Simple-HTTP-Request:v1.0'
+    implementation project (':_waveform')
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
 }

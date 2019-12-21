@@ -16,13 +16,15 @@
         android:layout_marginTop="40dp"
         android:background="@drawable/dampra"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="visible"
+        android:gravity = "bottom">
 
         <LinearLayout
             android:id="@+id/container_apps"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/label"
@@ -363,6 +365,13 @@
 
         </LinearLayout>
 
+        <com.newventuresoftware.waveform.WaveformView
+            android:id="@+id/waveformView"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_gravity="bottom"
+            android:background="#00FFFFFF"
+            app:mode="RECORDING" />
 
     </LinearLayout>
 
