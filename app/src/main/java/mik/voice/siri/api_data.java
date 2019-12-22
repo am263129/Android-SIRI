@@ -66,9 +66,6 @@ public class api_data extends AppCompatActivity {
         animationDrawable.start();
         sendPost();
 
-
-
-
     }
     Runnable mStatusChecker = new Runnable() {
         @Override

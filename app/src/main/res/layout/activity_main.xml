@@ -16,22 +16,21 @@
         android:layout_marginTop="40dp"
         android:background="@drawable/dampra"
         android:orientation="vertical"
-        android:visibility="visible"
-        android:gravity = "bottom">
+        android:visibility="visible">
 
         <LinearLayout
             android:id="@+id/container_apps"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <TextView
                 android:id="@+id/label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Recognition Result"
+                android:text="Similar Apps"
                 android:textColor="@android:color/background_light"
                 android:textSize="24sp" />
 
@@ -53,7 +52,6 @@
                 android:id="@+id/address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="DHAKA, BD"
                 android:textColor="@android:color/background_light"
                 android:textSize="24dp" />
 
@@ -61,7 +59,6 @@
                 android:id="@+id/updated_at"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="20 April 2012, 20:08 PM"
                 android:textSize="14dp" />
         </LinearLayout>
 
@@ -110,7 +107,6 @@
                         android:id="@+id/sunrise"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="06:40 AM"
                         android:textSize="14dp" />
                 </LinearLayout>
 
@@ -147,7 +143,6 @@
                         android:id="@+id/sunset"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="06:40 AM"
                         android:textSize="14dp" />
                 </LinearLayout>
 
@@ -184,7 +179,6 @@
                         android:id="@+id/wind"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="06:40 AM"
                         android:textSize="14dp" />
                 </LinearLayout>
             </LinearLayout>
@@ -228,7 +222,6 @@
                         android:id="@+id/pressure"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="06:40 AM"
                         android:textSize="14dp" />
                 </LinearLayout>
 
@@ -265,7 +258,6 @@
                         android:id="@+id/humidity"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="06:40 AM"
                         android:textSize="14dp" />
                 </LinearLayout>
 
@@ -302,7 +294,6 @@
                         android:id="@+id/about"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="AndroDocs"
                         android:textSize="14dp" />
                 </LinearLayout>
             </LinearLayout>
@@ -322,7 +313,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Clear Sky"
                 android:textColor="@android:color/holo_blue_light"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -333,9 +323,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:fontFamily="sans-serif-thin"
-                android:text="29°C"
                 android:textColor="@android:color/holo_orange_light"
-                android:textSize="90dp"
+                android:textSize="60dp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -348,7 +337,6 @@
                     android:id="@+id/temp_min"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Min Temp: 05:05 AM"
                     android:textColor="@android:color/background_light" />
 
                 <Space
@@ -359,7 +347,6 @@
                     android:id="@+id/temp_max"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Max Temp: 05:05 PM"
                     android:textColor="@android:color/background_light" />
             </LinearLayout>
 
@@ -384,14 +371,10 @@
         app:srcCompat="@android:drawable/ic_dialog_info" />
 
 
-    <EditText
+    <TextView
         android:id="@+id/edit_city_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="50dp"
-        android:ems="10"
-        android:inputType="textPersonName"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
         android:text="Name" />
 
     <ImageView

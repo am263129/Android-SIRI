@@ -36,11 +36,9 @@ public class PInfo_adapter extends ArrayAdapter<PInfo> {
 
         ImageView app_icon = v.findViewById(R.id.img_appicon);
         TextView app_name = v.findViewById(R.id.label_appname);
-        TextView app_version = v.findViewById(R.id.label_version);
 
         app_icon.setImageDrawable(array_apps.get(position).getIcon());
         app_name.setText(array_apps.get(position).getAppname());
-        app_version.setText(array_apps.get(position).getVersionName());
 
         return v;
 

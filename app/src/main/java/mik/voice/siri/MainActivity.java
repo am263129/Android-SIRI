@@ -6,11 +6,16 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.AnimationDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -34,10 +39,12 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import mik.voice.siri.apps.AppAdapter;
 import mik.voice.siri.apps.PInfo;
 import mik.voice.siri.apps.PInfo_adapter;
 
@@ -63,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private RecordingThread mRecordingThread;
     private static final int REQUEST_RECORD_AUDIO = 13;
     private final int REQ_CODE_SPEECH_INPUT = 100;
+    AppAdapter adapter;
 
 
     @Override
@@ -122,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // wave animation
-        set_animation();
+//        set_animation();
 
         //end
     }
@@ -161,46 +169,78 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
 
         super.onResume();
-        set_init();
-        set_animation();
+//        set_init();
+//        set_animation();
     }
     @Override
     protected void onStop() {
         super.onStop();
 
-        mRecordingThread.stopRecording();
+//        mRecordingThread.stopRecording();
     }
 
     public void inner_app_runner(){
-        weather_show(hide);
-        s_apps.clear();
-        for (Integer i = 0; i < apps.size(); i ++){
-            if(apps.get(i).getAppname().toLowerCase().contains(cityName.getText().toString()))
-                s_apps.add(apps.get(i));
-        }
+//        weather_show(hide);
 
-        if(s_apps.size()>0) {
-            if(s_apps.size() ==1){
-                String package_name = s_apps.get(0).getPname();
-                Intent launchIntent = getPackageManager().getLaunchIntentForPackage(package_name);
-                if (launchIntent != null) {
-                    startActivity(launchIntent);//null pointer check in case package name was not found
-                }
+        PackageManager pm=getPackageManager();
+        Intent main=new Intent(Intent.ACTION_MAIN, null);
+
+        main.addCategory(Intent.CATEGORY_LAUNCHER);
+
+        List<ResolveInfo> launchables=pm.queryIntentActivities(main, 0);
+
+        List<ResolveInfo> similar_launchables = pm.queryIntentActivities(main, 0);
+        similar_launchables.clear();
+        for (int i = 0; i < launchables.size(); i++){
+            String name = launchables.get(i).loadLabel(pm).toString();
+            if (name.toLowerCase().contains(CITY.toLowerCase())){
+                similar_launchables.add(launchables.get(i));
+            }
+
+        }
+        Collections.sort(similar_launchables,
+                new ResolveInfo.DisplayNameComparator(pm));
+
+        adapter=new AppAdapter(this,pm, similar_launchables);
+            if(similar_launchables.size() ==1){
+                ResolveInfo launchable=adapter.getItem(0);
+                ActivityInfo activity=launchable.activityInfo;
+                ComponentName name=new ComponentName(activity.applicationInfo.packageName,
+                        activity.name);
+                Intent i=new Intent(Intent.ACTION_MAIN);
+
+                i.addCategory(Intent.CATEGORY_LAUNCHER);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                        Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                i.setComponent(name);
+                startActivity(i);
             }
             else {
-                PInfo_adapter adapter = new PInfo_adapter(MainActivity.this, R.layout.item_apps, s_apps);
+//                PInfo_adapter adapter = new PInfo_adapter(MainActivity.this, R.layout.item_apps, s_apps);
                 similar_apps.setAdapter(adapter);
                 similar_apps.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        String package_name = s_apps.get(position).getPname();
-                        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(package_name);
-                        if (launchIntent != null) {
-                            startActivity(launchIntent);//null pointer check in case package name was not found
-                        }
+
+                        ResolveInfo launchable=adapter.getItem(position);
+                        ActivityInfo activity=launchable.activityInfo;
+                        ComponentName name=new ComponentName(activity.applicationInfo.packageName,
+                                activity.name);
+                        Intent i=new Intent(Intent.ACTION_MAIN);
+
+                        i.addCategory(Intent.CATEGORY_LAUNCHER);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                                Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                        i.setComponent(name);
+                        startActivity(i);
+
+//                        String package_name = s_apps.get(position).getPname();
+//                        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(package_name);
+//                        if (launchIntent != null) {
+//                            startActivity(launchIntent);//null pointer check in case package name was not found
+//                        }
                     }
                 });
-            }
         }
     }
 
@@ -377,16 +417,29 @@ public class MainActivity extends AppCompatActivity {
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     CITY = result.get(0);
                     cityName.setText(result.get(0).toString());
+
+                    ConnectivityManager ConnectionManager=(ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo networkInfo=ConnectionManager.getActiveNetworkInfo();
+                    if(networkInfo != null && networkInfo.isConnected()==true )
+                    {
+                        weather_show(show);
+                        try {
+                            new weatherTask().execute();
+                        }
+                        catch (Exception E){
+                            Log.e("error",E.toString());
+                        }
+//                        inner_app_runner();
+
+                    }
+                    else
+                    {
+                        inner_app_runner();
+                    }
                     /**
                      * weather
                      */
-                    weather_show(show);
-                    try {
-                        new weatherTask().execute();
-                    }
-                    catch (Exception E){
-                        Log.e("error",E.toString());
-                    }
+
                 }
                 break;
             }
