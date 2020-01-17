@@ -1,6 +1,43 @@
 <resources>
-    <string name="app_name">siri</string>
+    <string name="app_name">FLAG</string>
     <string name="speech_prompt">Say something&#8230;</string>
     <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
     <string name="tap_on_mic">Tap on mic to speak</string>
+    <string name="msg_alert_en">Are you sure to save changes?</string>
+    <string name="label_language_setting_en">Language Setting</string>
+    <string name="label_app_list_en">Similar Apps</string>
+    <string name="label_sunrise_en">Sunrise</string>
+    <string name="label_sunset_en">Sunset</string>
+    <string name="label_wind_en">Wind</string>
+    <string name="label_pressure_en">Pressure</string>
+    <string name="label_humidity_en">Humidity</string>
+    <string name="label_creadedby_en">Created by</string>
+    <string name="dialog_title_en">Loading Data...</string>
+    <string name="label_rules_en">Rules</string>
+    <string name="label_instructions_en">Instructions</string>
+    <string name="label_terms_en">Terms &amp; Conditions</string>
+    <string name="message_en">Say Something...</string>
+
+
+
+    <string name="speech_prompt_it">Di "'"qualcosa &#8230;</string>
+    <string name="speech_not_supported_ot">Scusate! Il dispositivo non supporta l"'"input vocale</string>
+    <string name="tap_on_mic_it">Tocca il microfono per parlare</string>
+    <string name="msg_alert_it">Sei sicuro di salvare le modifiche?</string>
+    <string name="yes_it">Sì</string>
+    <string name="no_it">Sei sicuro di salvare le modifiche?</string>
+    <string name="label_language_setting_it">Impostazione della lingua</string>
+    <string name="label_app_list_it">App simili</string>
+    <string name="label_sunrise_it">Alba</string>
+    <string name="label_sunset_it">Tramonto</string>
+    <string name="label_wind_it">Vento</string>
+    <string name="label_pressure_it">Pressione</string>
+    <string name="label_humidity_it">Umidità</string>
+    <string name="label_creadedby_it">Creato da</string>
+
+    <string name="label_rules_it">Regole</string>
+    <string name="label_instructions_it">Istruzioni</string>
+    <string name="label_terms_it">Termini &amp; condizioni</string>
+    <string name="dialog_title_it">Caricamento dati...</string>
+    <string name="message_it">Di "'"qualcosa...</string>
 </resources>

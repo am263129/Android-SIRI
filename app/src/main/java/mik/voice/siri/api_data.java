@@ -47,6 +47,7 @@ public class api_data extends AppCompatActivity {
     private Handler mHandler = new Handler();
     ListView list_rules, list_instructions, list_terms;
     ProgressDialog dialog;
+    TextView label_rules, label_instructions, label_terms;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,9 +57,16 @@ public class api_data extends AppCompatActivity {
         list_instructions = findViewById(R.id.list_instructions);
         list_rules = findViewById(R.id.list_rules);
         list_terms = findViewById(R.id.list_terms);
+        label_rules = findViewById(R.id.label_rules);
+        label_instructions = findViewById(R.id.label_Instructions);
+        label_terms = findViewById(R.id.label_term);
         dialog = new ProgressDialog(this);
-        dialog.setTitle("Loading Data...");
-        dialog.setCancelable(false);
+        if(global.English) {
+            dialog.setTitle(MainActivity.getInstance().getString(R.string.dialog_title_en));
+        }
+        else{
+            dialog.setTitle(MainActivity.getInstance().getString(R.string.dialog_title_it));
+        }
         dialog.show();
         AnimationDrawable animationDrawable = (AnimationDrawable) api_back.getBackground();
         animationDrawable.setEnterFadeDuration(10);
@@ -74,6 +82,22 @@ public class api_data extends AppCompatActivity {
             mHandler.postDelayed(mStatusChecker, 1000);
         }
     };
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(global.English){
+            label_rules.setText(MainActivity.getInstance().getString(R.string.label_rules_en));
+            label_instructions.setText(MainActivity.getInstance().getString(R.string.label_instructions_en));
+            label_terms.setText(MainActivity.getInstance().getString(R.string.label_terms_en));
+        }
+        else{
+            label_rules.setText(MainActivity.getInstance().getString(R.string.label_rules_it));
+            label_instructions.setText(MainActivity.getInstance().getString(R.string.label_instructions_it));
+            label_terms.setText(MainActivity.getInstance().getString(R.string.label_terms_it));
+        }
+    }
+
     public void sendPost() {
         Thread thread = new Thread(new Runnable() {
             @Override

@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#111C3A</color>
     <color name="colorAccent">#D81B60</color>
     <color name="colorTransparent">#6AB258FF</color>
-    <color name="colorGradientStart">#0044D1</color>
-    <color name="colorGradientCenter">#0E005A</color>
-    <color name="colorGradientEnd">#610AFF</color>
+    <color name="colorGradientStart">#ED7EFF</color>
+    <color name="colorGradientCenter">#F7E57F</color>
+    <color name="colorGradientEnd">#FC847B</color>
 </resources>
