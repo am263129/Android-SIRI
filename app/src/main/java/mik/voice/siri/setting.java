@@ -30,14 +30,6 @@ public class setting extends AppCompatActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         LinearLayout setting_back = findViewById(R.id.setting_back);
-        btn_info = findViewById(R.id.btn_api_data);
-        btn_info.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(setting.this, api_data.class);
-                startActivity(intent);
-            }
-        });
         lan_us = findViewById(R.id.lan_us);
         lan_it = findViewById(R.id.lan_it);
         en = findViewById(R.id.en);

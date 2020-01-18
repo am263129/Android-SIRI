@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root_back"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_animation"
-    android:orientation="vertical"
-    android:padding="25dp">
+    android:orientation="vertical">
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:id="@+id/root_back"
+            android:layout_width="match_parent"
+            android:background="@drawable/gradient_animation"
+            android:layout_height="match_parent"
+            android:padding="25dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,26 +24,30 @@
             android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="Button"
+            android:visibility="invisible" />
 
         <Button
             android:id="@+id/button2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="Button"
+            android:visibility="invisible" />
 
         <Button
             android:id="@+id/button3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="Button"
+            android:visibility="invisible" />
 
         <Button
             android:id="@+id/button4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Button" />
+            android:text="Button"
+            android:visibility="invisible" />
     </LinearLayout>
 
     <FrameLayout
@@ -51,20 +62,12 @@
 
     </FrameLayout>
 
-    <ImageView
-        android:id="@+id/setting"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="false"
-        android:layout_alignParentRight="true"
-        app:srcCompat="@drawable/ico_setting" />
 
-
-    <TextView
-        android:id="@+id/edit_city_name"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:text="Name" />
+            <TextView
+                android:id="@+id/edit_city_name"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:textSize="24sp" />
 
     <ImageView
         android:id="@+id/run"
@@ -92,5 +95,16 @@
         android:text="Something went wrong"
         android:visibility="gone" />
 
+
+    </RelativeLayout>
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/nav_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:fitsSystemWindows="true"
+            app:headerLayout="@layout/nav_header_main"
+            app:menu="@menu/activity_main_drawer" />
+    </androidx.drawerlayout.widget.DrawerLayout>
 
 </RelativeLayout>

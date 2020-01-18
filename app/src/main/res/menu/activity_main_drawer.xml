@@ -5,22 +5,22 @@
         <item
             android:id="@+id/add_new_member"
             android:icon="@drawable/info"
-            android:title="Add New Member"
+            android:title="I don't know"
             android:visible="false" />
         <item android:id="@+id/menu_all_task"
             android:icon="@drawable/info"
-            android:title="All Task" />
+            android:title="I don't know" />
         <item android:id="@+id/menu_make_task"
             android:icon="@drawable/info"
-            android:title="Make New Task" />
+            android:title="I don't know" />
         <item android:id="@+id/menu_mytask"
             android:icon="@drawable/info"
-            android:title="My Tasks" />
-        <item android:id="@+id/task_I_created"
+            android:title="I don't know" />
+        <item android:id="@+id/menu_setting"
             android:icon="@drawable/info"
-            android:title="Task I Created" />
-        <item android:id="@+id/menu_profile_setting"
+            android:title="Setting" />
+        <item android:id="@+id/menu_about"
             android:icon="@drawable/info"
-            android:title="Profile" />
+            android:title="About" />
     </group>
 </menu>

@@ -19,4 +19,6 @@ public class global {
     public static String windSpeed = "";
     public static String pressure = "";
     public static String humidity = "";
+
+    public static String speech_result;
 }

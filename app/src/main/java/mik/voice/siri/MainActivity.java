@@ -36,6 +36,7 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -48,6 +49,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androdocs.httprequest.HttpRequest;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.newventuresoftware.waveform.WaveformView;
 
@@ -67,6 +69,8 @@ import java.util.Locale;
 
 import mik.voice.siri.apps.AppAdapter;
 import mik.voice.siri.apps.PInfo;
+import mik.voice.siri.apps.PInfo_adapter;
+import mik.voice.siri.fragments.app_list;
 import mik.voice.siri.fragments.calculator;
 import mik.voice.siri.fragments.weather;
 import mik.voice.siri.utils.tool_functions;
@@ -79,31 +83,29 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     String CITY = "Tokyo";
     String API = "8118ed6ee68db2debfaaa5a44c832918";
-
     TextView  cityName;
-
     ImageView run;
     LinearLayout container_apps;
-    ListView similar_apps;
+
     RelativeLayout root_back;
     ImageView setting;
     boolean Listenting = false;
     boolean show = true;
     boolean hide = false;
-    ArrayList<PInfo> apps = new ArrayList<>();
-    ArrayList<PInfo> s_apps = new ArrayList<>();
 
+    ArrayList<PInfo> s_apps = new ArrayList<>();
     private WaveformView mRealtimeWaveformView;
     private RecordingThread mRecordingThread;
     private static final int REQUEST_RECORD_AUDIO = 13;
     private final int REQ_CODE_SPEECH_INPUT = 100;
-    AppAdapter adapter;
+
     Dialog dialog;
     Integer MY_PERMISSIONS_REQUEST_READ_STATE = 9003;
     Button test_1,test_2,test_3,test_4;
-
     public static MainActivity self;
     AlarmManager alarmMgr;
+    NavigationView navigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,12 +113,11 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         self = this;
         get_setting();
         check_permission();
+        navigationView = (NavigationView)findViewById(R.id.nav_view);
         cityName = findViewById(R.id.edit_city_name);
         container_apps = findViewById(R.id.container_apps);
-        similar_apps = findViewById(R.id.similar_apps);
+
         run = findViewById(R.id.run);
-
-
         test_1 = findViewById(R.id.button);
         test_2 = findViewById(R.id.button2);
         test_3 = findViewById(R.id.button3);
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         test_1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadFragment(new weather());
+                get_weathre_data();
             }
         });
         test_2.setOnClickListener(new View.OnClickListener() {
@@ -171,18 +172,29 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             }
         });
         root_back = findViewById(R.id.root_back);
-        get_installed_app();
+
         AnimationDrawable animationDrawable = (AnimationDrawable) root_back.getBackground();
         animationDrawable.setEnterFadeDuration(10);
         animationDrawable.setExitFadeDuration(5000);
         animationDrawable.start();
-
-        setting = findViewById(R.id.setting);
-        setting.setOnClickListener(new View.OnClickListener() {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, setting.class);
-                startActivity(intent);
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                Intent intent;
+                switch (menuItem.getItemId()){
+                    case R.id.menu_setting:
+                        intent = new Intent(MainActivity.this, setting.class);
+                        startActivity(intent);
+                        return true;
+                    case R.id.menu_about:
+                        intent = new Intent(MainActivity.this, api_data.class);
+                        startActivity(intent);
+                        return true;
+                    case R.id.menu_mytask:
+                        return true;
+                    default:
+                        return true;
+                }
             }
         });
 
@@ -257,27 +269,27 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,Locale.getDefault());
+//        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,Locale.getDefault());
 //        if(global.English) {
-//            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
 //        }
 //        else{
 //            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "it-IT");
 //        }
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
                 getString(R.string.speech_prompt));
-//        speechRecognizer.startListening(intent);
-//        if (dialog){
-//            show_shadow_dialog();
-//        }
-        try {
-            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
-//            show_shadow_dialog();
-        } catch (ActivityNotFoundException a) {
-            Toast.makeText(getApplicationContext(),
-                    getString(R.string.speech_not_supported),
-                    Toast.LENGTH_SHORT).show();
+        speechRecognizer.startListening(intent);
+        if (dialog){
+            show_shadow_dialog();
         }
+//        try {
+//            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+////            show_shadow_dialog();
+//        } catch (ActivityNotFoundException a) {
+//            Toast.makeText(getApplicationContext(),
+//                    getString(R.string.speech_not_supported),
+//                    Toast.LENGTH_SHORT).show();
+//        }
     }
 
     private void show_shadow_dialog() {
@@ -318,68 +330,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 //        mRecordingThread.stopRecording();
     }
 
-    public void inner_app_runner(){
-//        weather_show(hide);
 
-        PackageManager pm=getPackageManager();
-        Intent main=new Intent(Intent.ACTION_MAIN, null);
-        main.addCategory(Intent.CATEGORY_LAUNCHER);
-        List<ResolveInfo> launchables=pm.queryIntentActivities(main, 0);
-
-        List<ResolveInfo> similar_launchables = pm.queryIntentActivities(main, 0);
-        similar_launchables.clear();
-        for (int i = 0; i < launchables.size(); i++){
-            String name = launchables.get(i).loadLabel(pm).toString();
-            if (name.toLowerCase().contains(CITY.toLowerCase())){
-                similar_launchables.add(launchables.get(i));
-            }
-
-        }
-        Collections.sort(similar_launchables,
-                new ResolveInfo.DisplayNameComparator(pm));
-
-        adapter=new AppAdapter(this,pm, similar_launchables);
-            if(similar_launchables.size() ==1){
-                ResolveInfo launchable=adapter.getItem(0);
-                ActivityInfo activity=launchable.activityInfo;
-                ComponentName name=new ComponentName(activity.applicationInfo.packageName,
-                        activity.name);
-                Intent i=new Intent(Intent.ACTION_MAIN);
-
-                i.addCategory(Intent.CATEGORY_LAUNCHER);
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                        Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                i.setComponent(name);
-                startActivity(i);
-            }
-            else {
-//                PInfo_adapter adapter = new PInfo_adapter(MainActivity.this, R.layout.item_apps, s_apps);
-                similar_apps.setAdapter(adapter);
-                similar_apps.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                        ResolveInfo launchable=adapter.getItem(position);
-                        ActivityInfo activity=launchable.activityInfo;
-                        ComponentName name=new ComponentName(activity.applicationInfo.packageName,
-                                activity.name);
-                        Intent i=new Intent(Intent.ACTION_MAIN);
-
-                        i.addCategory(Intent.CATEGORY_LAUNCHER);
-                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                                Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                        i.setComponent(name);
-                        startActivity(i);
-
-//                        String package_name = s_apps.get(position).getPname();
-//                        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(package_name);
-//                        if (launchIntent != null) {
-//                            startActivity(launchIntent);//null pointer check in case package name was not found
-//                        }
-                    }
-                });
-        }
-    }
 
 //    public void weather_show(boolean show){
 //        if(show){
@@ -402,37 +353,12 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 //        container_apps.setVisibility(View.GONE);
 //    }
 
-    public void get_installed_app(){
-        Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        List<ResolveInfo> pkgAppsList = this.getPackageManager().queryIntentActivities( mainIntent, 0);
-        apps.clear();
-        apps = getPackages();
-    }
 
 
-    private ArrayList<PInfo> getPackages() {
-        ArrayList<PInfo> apps = getInstalledApps(false); /* false = no system packages */
-        final int max = apps.size();
-        for (int i=0; i<max; i++) {
-            apps.get(i).prettyPrint();
-        }
-        return apps;
-    }
 
-    private ArrayList<PInfo> getInstalledApps(boolean getSysPackages) {
-        ArrayList<PInfo> res = new ArrayList<PInfo>();
-        List<PackageInfo> packs = getPackageManager().getInstalledPackages(0);
-        for(int i=0;i<packs.size();i++) {
-            PackageInfo p = packs.get(i);
-            if ((!getSysPackages) && (p.versionName == null)) {
-                continue ;
-            }
-            PInfo newInfo = new PInfo(p.applicationInfo.loadLabel(getPackageManager()).toString(),p.packageName,p.versionName, p.versionCode, p.applicationInfo.loadIcon(getPackageManager()));
-            res.add(newInfo);
-        }
-        return res;
-    }
+
+
+
 
     public String word_to_num(String input){
         boolean isValidInput = true;
@@ -701,27 +627,30 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             }
 
             else{
-                global.CALCULATOR = false;
-                ConnectivityManager ConnectionManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo networkInfo = ConnectionManager.getActiveNetworkInfo();
-                if (networkInfo != null && networkInfo.isConnected() == true) {
-                    Toast.makeText(this, "Network is OK", Toast.LENGTH_LONG).show();
-//            weather_show(show);
-                    try {
-                        new weatherTask().execute();
-                    } catch (Exception E) {
-                        Log.e("error", E.toString());
-                        Toast.makeText(this, "Error " + E.toString(), Toast.LENGTH_LONG).show();
-                    }
-//                        inner_app_runner();
-
-                } else {
-                    Toast.makeText(this, "Network Error", Toast.LENGTH_LONG).show();
-                    inner_app_runner();
-                }
+                get_weathre_data();
             }
 
 
+        }
+    }
+    public void get_weathre_data(){
+        global.CALCULATOR = false;
+        ConnectivityManager ConnectionManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = ConnectionManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected() == true) {
+            Toast.makeText(this, "Network is OK", Toast.LENGTH_LONG).show();
+//            weather_show(show);
+            try {
+                new weatherTask().execute();
+            } catch (Exception E) {
+                Log.e("error", E.toString());
+                Toast.makeText(this, "Error " + E.toString(), Toast.LENGTH_LONG).show();
+            }
+//                        inner_app_runner();
+
+        } else {
+            Toast.makeText(this, "Network Error", Toast.LENGTH_LONG).show();
+            loadFragment(new app_list());
         }
     }
 
@@ -804,7 +733,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
 
                 ////show app list!
-                inner_app_runner();
+                loadFragment(new app_list());
             }
 
         }
@@ -881,7 +810,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                     else
                     {
                         Toast.makeText(this,"Network Error",Toast.LENGTH_LONG).show();
-                        inner_app_runner();
+                        loadFragment(new app_list());
                     }
                     /**
                      * weather

@@ -10,10 +10,11 @@
         android:id="@+id/calculate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="2dp"
-        android:background="@color/default_timecode"
+        android:layout_marginLeft="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginRight="2dp"
         android:enabled="false"
-        android:gravity="bottom"
+        android:gravity="bottom|right"
         android:lines="2"
         android:maxLines="2"
         android:textColor="@color/colorPrimaryDark"
@@ -25,10 +26,9 @@
         android:layout_height="50dp"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
-        android:background="@color/default_timecode"
-        android:gravity="center"
+        android:gravity="right|center_vertical"
         android:textColor="@color/default_background"
-        android:textSize="18sp" />
+        android:textSize="24sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
